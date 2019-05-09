@@ -720,12 +720,7 @@ public class FileOperationsHelper {
 
         OCCapability capability = mFileActivity.getStorageManager().getCapability(mFileActivity.getAccount().name);
         SendShareDialog mSendShareDialog;
-        if (capability != null) {
-            mSendShareDialog = SendShareDialog.newInstance(file, hideNcSharingOptions,
-                    capability.getFilesSharingPublicPasswordEnforced().isTrue());
-        } else {
-            mSendShareDialog = SendShareDialog.newInstance(file, hideNcSharingOptions, false);
-        }
+        mSendShareDialog = SendShareDialog.newInstance(file, hideNcSharingOptions, capability);
         mSendShareDialog.setFileOperationsHelper(this);
         mSendShareDialog.show(ft, "TAG_SEND_SHARE_DIALOG");
     }

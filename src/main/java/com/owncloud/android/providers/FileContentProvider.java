@@ -769,7 +769,8 @@ public class FileContentProvider extends ContentProvider {
                        + ProviderTableMeta.CAPABILITIES_RICHDOCUMENT + INTEGER
                        + ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_MIMETYPE_LIST + TEXT
                        + ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_DIRECT_EDITING + INTEGER
-                       + ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_TEMPLATES + " INTEGER );");
+                       + ProviderTableMeta.CAPABILITIES_RICHDOCUMENT_TEMPLATES + INTEGER
+                       + ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_ASK_FOR_PASSWORD + " INTEGER );");
     }
 
     private void createUploadsTable(SQLiteDatabase db) {
@@ -1915,6 +1916,25 @@ public class FileContentProvider extends ContentProvider {
                 try {
                     db.execSQL(ALTER_TABLE + ProviderTableMeta.FILE_TABLE_NAME +
                                    ADD_COLUMN + ProviderTableMeta.FILE_SHAREES + " TEXT ");
+
+                    upgraded = true;
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+            }
+
+            if (!upgraded) {
+                Log_OC.i(SQL, String.format(Locale.ENGLISH, UPGRADE_VERSION_MSG, oldVersion, newVersion));
+            }
+
+            if (oldVersion < 46 && newVersion >= 46) {
+                Log_OC.i(SQL, "Entering in the #46 add askForPassword to capability table");
+                db.beginTransaction();
+                try {
+                    db.execSQL(ALTER_TABLE + ProviderTableMeta.CAPABILITIES_TABLE_NAME +
+                                   ADD_COLUMN + ProviderTableMeta.CAPABILITIES_SHARING_PUBLIC_ASK_FOR_PASSWORD +
+                                   " INTEGER ");
 
                     upgraded = true;
                     db.setTransactionSuccessful();
